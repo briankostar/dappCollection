@@ -3,16 +3,16 @@ pragma experimental "v0.5.0";
 
 contract BetContract {
     
-    //creator puts amount. 0.05, 0.5, 5eth, etc. 
-    //specifies secret? time expire, judge addr
-    //only 1 other can accept. 
+    //creator sends eth, and sets expiredate and judge addr
     
-    //other must accept in 1 day or ETH gets returned
-    //if judge doesnt decide, money gets returned
-    //if decided, all escrow gets sent to one party.
+    //other must accept in 1 day or before expireDate. Otherwise creator's ETH gets returned
+    //if judge doesnt decide, money gets returned to each party
+    //if decided, all escrow gets sent to winning party
     
     uint256 callerResponseExpireDate;
     uint256 judgeResponseExpireDate;
+    enum WinningStatus { Pending, Creator, Caller }
+    // Bet[] public bets;
     
     struct Bet {
         address raiser;
@@ -20,16 +20,35 @@ contract BetContract {
         address judge;
         uint256 amount;
         uint256 expireDate;
+        WinningStatus status;
     }
     
-    function createBet() public {}
+    //creator may only have one bet at a time
+    mapping(address => Bet) public bets;
     
-    function acceptBet() public {
-        
+    function createBet(address judge, uint256 amount, uint256 expireDate) public {
+        //if creator hasn't created a bet yet:
+        //if money received
+        bets[msg.sender] = Bet(msg.sender, 0, judge, amount, expireDate, WinningStatus.Pending);
+        //put into escrow
     }
     
-    function judgeBet() public {
-        
+    function acceptBet(address creatorBetAddress) public {
+        //if bet exists, accept bet
+        bets[creatorBetAddress].caller = msg.sender;
+        //put matching amount into escrow
+    }
+    
+    function judgeBet(address creatorBetAddress, bool creatorIsWinner) public {
+        //if bet exists and the judge is calling this, declare winner 
+        if( bets[creatorBetAddress].judge == msg.sender){
+            if(creatorIsWinner){
+                bets[creatorBetAddress].status = WinningStatus.Creator;
+            }else{
+                bets[creatorBetAddress].status = WinningStatus.Caller;
+            }
+        }
+        //release escrow accordingly
     }
     
     function refundBet() private {

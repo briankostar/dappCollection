@@ -1,9 +1,10 @@
 pragma solidity ^0.4.25;
+pragma experimental "v0.5.0";
 
-contract Bet {
+contract BetContract {
     
-    //creator specifies amount. 0.05, 0.5, 5eth, etc. 
-    //specifies secret? (so only those who know this can accept) time expire, judge addr
+    //creator puts amount. 0.05, 0.5, 5eth, etc. 
+    //specifies secret? time expire, judge addr
     //only 1 other can accept. 
     
     //other must accept in 1 day or ETH gets returned
@@ -20,6 +21,26 @@ contract Bet {
         uint256 amount;
         uint256 expireDate;
     }
+    
+    function createBet() public {}
+    
+    function acceptBet() public {
+        
+    }
+    
+    function judgeBet() public {
+        
+    }
+    
+    function refundBet() private {
+        
+    }
+    
+    function kill() public constant{
+        //destructor
+        // selfdestruct()
+    }
+    
     
     
 }

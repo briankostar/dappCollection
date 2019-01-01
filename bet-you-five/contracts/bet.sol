@@ -14,8 +14,8 @@ contract BetContract is Secondary  {
     //if judge doesnt decide, money gets returned to each party
     //if decided, all escrow gets sent to winning party
 
-    event Deposited(address indexed payee, uint256 weiAmount);
-    event Withdrawn(address indexed payee, uint256 weiAmount);
+    event Deposited(address payee, uint256 weiAmount);
+    event Withdrawn(address payee, uint256 weiAmount);
     
     uint256 callerResponseExpireDate;
     uint256 judgeResponseExpireDate;
@@ -23,6 +23,7 @@ contract BetContract is Secondary  {
     // Bet[] public bets;
     
     struct Bet {
+        bool exists;
         address raiser;
         address caller;
         address judge;
@@ -35,11 +36,15 @@ contract BetContract is Secondary  {
     mapping(address => Bet) public bets;
     mapping(address => uint256) private _deposits;
     
-    function createBet(address judge, uint256 amount, uint256 expireDate) public {
+    function createBet(address judge, uint256 amount, uint256 expireDate) public payable {
         //if creator hasn't created a bet yet:
-        //if money received
-        bets[msg.sender] = Bet(msg.sender, 0, judge, amount, expireDate, WinningStatus.Pending);
+        if(bets[msg.sender].exists == true){
+            revert("This user already made a bet");
+        }
+        bets[msg.sender] = Bet(true, msg.sender, address(0), judge, amount, expireDate, WinningStatus.Pending);
         //put into escrow
+        deposit(msg.sender);
+        //if failed refund money
     }
     
     function acceptBet(address creatorBetAddress) public {
@@ -64,10 +69,11 @@ contract BetContract is Secondary  {
         
     }
     
-    function kill() public {
-        //destructor
-        // selfdestruct()
-    }
+    // function kill() public {
+    //     //destructor
+    //     // selfdestruct()
+    // }
+    
     
     function depositsOf(address payee) public view returns (uint256) {
         return _deposits[payee];

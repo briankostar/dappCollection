@@ -1,14 +1,18 @@
 pragma solidity ^0.4.25;
 pragma experimental "v0.5.0";
 
-contract BetContract {
+import "./SafeMath.sol";
+import "./Secondary.sol";
+
+contract BetContract is Secondary  {
+    
+    using SafeMath for uint256;
     
     //creator sends eth, and sets expiredate and judge addr
     
     //other must accept in 1 day or before expireDate. Otherwise creator's ETH gets returned
     //if judge doesnt decide, money gets returned to each party
     //if decided, all escrow gets sent to winning party
-
 
     event Deposited(address indexed payee, uint256 weiAmount);
     event Withdrawn(address indexed payee, uint256 weiAmount);
@@ -60,7 +64,7 @@ contract BetContract {
         
     }
     
-    function kill() public constant{
+    function kill() public {
         //destructor
         // selfdestruct()
     }
